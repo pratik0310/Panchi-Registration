@@ -6,17 +6,24 @@ $name = isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Volunteer';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You - Volunteers of Vitthal</title>
+    <title>Thank You - Panchi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="thankyou-container">
         <div class="thankyou-card">
-            <div class="thankyou-icon"><img src="logo.png" alt="Panchi" height="150px" width="350px"></div>
+            <!-- Logo - Fixed Path -->
+            <div class="logo-container">
+                <img src="logo.png" alt="Panchi" class="thankyou-logo" onerror="this.style.display='none'">
+                <div class="logo-fallback">🕊️</div>
+            </div>
+
+            <div class="thankyou-icon"></div>
             <h1>Registration Successful!</h1>
-            <h2>Thank You, <?php echo $name; ?>! 🙏</h2>
-            <p>You are now registered as a volunteer for <strong>Volunteers of Vitthal</strong>.</p>
+            <h2>Thank You, <?php echo $name; ?>! </h2>
+            
+            <p>You are now registered as a volunteer</p>
             <p>We will contact you shortly with more details.</p>
             
             <div class="thankyou-message">
@@ -32,7 +39,7 @@ $name = isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Volunteer';
             </div>
             
             <div class="thankyou-footer">
-                <i class="fas fa-heart"></i> Volunteers of Vitthal &bull; Service with Devotion
+                <i class="fas fa-heart"></i> Panchi &bull; Service with Devotion
             </div>
         </div>
     </div>
