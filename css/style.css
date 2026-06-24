@@ -2457,3 +2457,81 @@ tr:hover {
         font-size: 18px;
     }
 }
+
+/* ===== PROGRESS STEPS - WITH CHECKMARK ===== */
+.step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0d6c8;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.step-number .step-number-text {
+    display: inline;
+}
+
+.step-number .step-number-check {
+    display: none;
+    font-size: 18px;
+}
+
+/* Active Step */
+.step.active .step-number {
+    background: #b8860b;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+}
+
+.step.active .step-number .step-number-text {
+    display: inline;
+}
+
+.step.active .step-number .step-number-check {
+    display: none;
+}
+
+/* Completed Step - Green with Checkmark */
+.step.completed .step-number {
+    background: #28a745;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.step.completed .step-number .step-number-text {
+    display: none;
+}
+
+.step.completed .step-number .step-number-check {
+    display: inline;
+}
+
+.step-label {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #999;
+    font-weight: 600;
+}
+
+.step.active .step-label {
+    color: #b8860b;
+}
+
+.step.completed .step-label {
+    color: #28a745;
+}
+
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}

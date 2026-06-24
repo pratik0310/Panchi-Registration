@@ -13,10 +13,10 @@
     <!-- ===== PRELOADER ===== -->
     <div id="preloader">
         <div class="preloader-content">
-            <img src="logo.png" alt="Panchi" class="preloader-logo" onerror="this.style.display='none'">
+            <img src="images/logo.png" alt="Panchi" class="preloader-logo" onerror="this.style.display='none'">
             <span class="preloader-fallback" style="display: none;">🕊️</span>
-            <h2 class="preloader-brand">Volunteers of <span>Vitthal</span></h2>
-            <p class="preloader-tagline">Service with Devotion</p>
+            <h2 class="preloader-brand">Volunteers of <span>Panchi</span></h2>
+            <p class="preloader-tagline">Service with Devotion ❤️</p>
             <div class="preloader-spinner">
                 <span class="dot"></span>
                 <span class="dot"></span>
@@ -30,7 +30,7 @@
         <div class="header">
             <!-- Company Logo -->
             <div class="logo-container">
-                <img src="logo.png" alt="Panchi" class="company-logo" onerror="this.style.display='none'">
+                <img src="logo2.png" alt="Panchi" class="company-logo" onerror="this.style.display='none'">
                 <div class="logo-fallback">🕊️</div>
             </div>
             
@@ -49,19 +49,31 @@
             <!-- Progress Steps -->
             <div class="progress-steps" id="progressSteps">
                 <div class="step active" data-step="1">
-                    <span class="step-number">1</span>
+                    <span class="step-number">
+                        <span class="step-number-text">1</span>
+                        <span class="step-number-check">✓</span>
+                    </span>
                     <span class="step-label">Personal</span>
                 </div>
                 <div class="step" data-step="2">
-                    <span class="step-number">2</span>
+                    <span class="step-number">
+                        <span class="step-number-text">2</span>
+                        <span class="step-number-check">✓</span>
+                    </span>
                     <span class="step-label">Contact</span>
                 </div>
                 <div class="step" data-step="3">
-                    <span class="step-number">3</span>
+                    <span class="step-number">
+                        <span class="step-number-text">3</span>
+                        <span class="step-number-check">✓</span>
+                    </span>
                     <span class="step-label">Event</span>
                 </div>
                 <div class="step" data-step="4">
-                    <span class="step-number">4</span>
+                    <span class="step-number">
+                        <span class="step-number-text">4</span>
+                        <span class="step-number-check">✓</span>
+                    </span>
                     <span class="step-label">Payment</span>
                 </div>
             </div>
@@ -79,17 +91,17 @@
                 <div class="section-content">
                     <div class="form-group">
                         <label>1. Full Name <span class="required">*</span></label>
-                        <input type="text" name="full_name" placeholder="Enter your full name" required>
+                        <input type="text" name="full_name" placeholder="Enter your full name" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>5. Age <span class="required">*</span></label>
-                            <input type="number" name="age" placeholder="Your age" min="1" max="120" required>
+                            <input type="number" name="age" placeholder="Your age" min="1" max="120" required oninput="updateProgress()">
                         </div>
                         <div class="form-group">
                             <label>6. Gender <span class="required">*</span></label>
-                            <select name="gender" required>
+                            <select name="gender" required onchange="updateProgress()">
                                 <option value="">Select</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -114,22 +126,22 @@
                 <div class="section-content">
                     <div class="form-group">
                         <label>2. Mobile Number <span class="required">*</span></label>
-                        <input type="tel" name="mobile_number" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                        <input type="tel" name="mobile_number" placeholder="10-digit mobile number" pattern="[0-9]{10}" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>3. WhatsApp Number <span class="required">*</span></label>
-                        <input type="tel" name="whatsapp_number" placeholder="10-digit WhatsApp number" pattern="[0-9]{10}" required>
+                        <input type="tel" name="whatsapp_number" placeholder="10-digit WhatsApp number" pattern="[0-9]{10}" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>4. Email ID <span class="required">*</span></label>
-                        <input type="email" name="email" placeholder="your@email.com" required>
+                        <input type="email" name="email" placeholder="your@email.com" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>7. City / Area <span class="required">*</span></label>
-                        <input type="text" name="city" placeholder="Your city or locality" required>
+                        <input type="text" name="city" placeholder="Your city or locality" required oninput="updateProgress()">
                     </div>
                 </div>
             </div>
@@ -147,32 +159,32 @@
                 <div class="section-content">
                     <div class="form-group">
                         <label>8. Number of Participants <span class="required">*</span></label>
-                        <input type="number" name="participants" placeholder="How many people are joining?" min="1" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>9. Names of Additional Family Members <span class="hint">(if any)</span></label>
-                        <input type="text" name="family_members" placeholder="Names of others joining with you">
+                        <input type="number" name="participants" placeholder="How many people are joining?" min="1" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>10. Emergency Contact Name <span class="required">*</span></label>
-                        <input type="text" name="emergency_name" placeholder="Full name of emergency contact" required>
+                        <input type="text" name="emergency_name" placeholder="Full name of emergency contact" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>11. Emergency Contact Number <span class="required">*</span></label>
-                        <input type="tel" name="emergency_phone" placeholder="10-digit emergency number" pattern="[0-9]{10}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>12. Medical Conditions <span class="hint">(if any)</span></label>
-                        <input type="text" name="medical_conditions" placeholder="Any medical conditions we should know about">
+                        <input type="tel" name="emergency_phone" placeholder="10-digit emergency number" pattern="[0-9]{10}" required oninput="updateProgress()">
                     </div>
 
                     <div class="form-group">
                         <label>13. How did you hear about this event? What are your expectations? <span class="required">*</span></label>
-                        <textarea name="expectations" placeholder="Tell us how you found us and what you hope to gain from this experience..." required></textarea>
+                        <textarea name="expectations" placeholder="Tell us how you found us and what you hope to gain from this experience..." required oninput="updateProgress()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>9. Names of Additional Family Members <span class="hint">(if any)</span></label>
+                        <input type="text" name="family_members" placeholder="Names of others joining with you" oninput="updateProgress()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>12. Medical Conditions <span class="hint">(if any)</span></label>
+                        <input type="text" name="medical_conditions" placeholder="Any medical conditions we should know about" oninput="updateProgress()">
                     </div>
                 </div>
             </div>
@@ -191,7 +203,7 @@
                     <div class="form-group">
                         <label>14. UPI Payment Screenshot Upload <span class="required">*</span></label>
                         <div class="file-upload-wrapper">
-                            <input type="file" name="payment_screenshot" accept="image/*" required id="fileInput">
+                            <input type="file" name="payment_screenshot" accept="image/*" required id="fileInput" onchange="updateProgress()">
                             <div class="file-upload-box" id="fileUploadBox">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Click or drag to upload payment screenshot</p>
@@ -203,7 +215,7 @@
 
                     <div class="declaration">
                         <label>
-                            <input type="checkbox" name="declaration" value="1" required>
+                            <input type="checkbox" name="declaration" value="1" required onchange="updateProgress()">
                             <span>
                                 <strong>Declaration:</strong> I understand this is a <span class="highlight">volunteer activity</span>
                                 and registration fees are <span class="highlight">non-refundable</span>.
@@ -234,7 +246,6 @@
             }, 1000);
         });
 
-        // Fallback: Hide preloader after 5 seconds
         setTimeout(function() {
             const preloader = document.getElementById('preloader');
             if (preloader && !preloader.classList.contains('hide')) {
@@ -314,41 +325,80 @@
         });
 
         // ===== RUN ON LOAD & RESIZE =====
-        window.addEventListener('load', handleResponsiveCollapse);
-        window.addEventListener('resize', handleResponsiveCollapse);
-
-        // ===== PROGRESS STEPS UPDATE =====
-        document.querySelectorAll('.form-section').forEach(section => {
-            const observer = new MutationObserver(() => {
-                updateProgress();
-            });
-            observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('load', function() {
+            handleResponsiveCollapse();
+            updateProgress();
+        });
+        window.addEventListener('resize', function() {
+            handleResponsiveCollapse();
+            updateProgress();
         });
 
+        // ===== PROGRESS STEPS - GREEN WITH CHECKMARK =====
         function updateProgress() {
             const sections = document.querySelectorAll('.form-section');
             const steps = document.querySelectorAll('.step');
-            let filled = 0;
             
-            sections.forEach(section => {
-                const inputs = section.querySelectorAll('input, select, textarea');
+            sections.forEach((section, index) => {
+                // Get all required fields in this section
+                const requiredInputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+                const requiredCheckboxes = section.querySelectorAll('input[type="checkbox"][required]');
+                const requiredFiles = section.querySelectorAll('input[type="file"][required]');
+                
                 let allFilled = true;
-                inputs.forEach(input => {
-                    if (input.hasAttribute('required') && !input.value.trim()) {
+                
+                // Check all required inputs
+                requiredInputs.forEach(input => {
+                    if (!input.value || input.value.trim() === '') {
                         allFilled = false;
                     }
                 });
-                if (allFilled) filled++;
-            });
-            
-            steps.forEach((step, index) => {
-                step.classList.remove('active', 'completed');
-                if (index < filled) {
-                    step.classList.add('completed');
-                } else if (index === filled) {
-                    step.classList.add('active');
+                
+                // Check all required checkboxes
+                requiredCheckboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        allFilled = false;
+                    }
+                });
+                
+                // Check all required file inputs
+                requiredFiles.forEach(fileInput => {
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        allFilled = false;
+                    }
+                });
+                
+                // Update step
+                const step = steps[index];
+                if (step) {
+                    step.classList.remove('completed', 'active');
+                    
+                    if (allFilled) {
+                        step.classList.add('completed');
+                    } else if (index === 0) {
+                        step.classList.add('active');
+                    } else {
+                        // Check if previous step is completed
+                        const prevStep = steps[index - 1];
+                        if (prevStep && prevStep.classList.contains('completed')) {
+                            step.classList.add('active');
+                        } else if (index === 0) {
+                            step.classList.add('active');
+                        }
+                    }
                 }
             });
+            
+            // Ensure first step is active if nothing is active
+            let hasActive = false;
+            steps.forEach(step => {
+                if (step.classList.contains('active') || step.classList.contains('completed')) {
+                    hasActive = true;
+                }
+            });
+            if (!hasActive && steps.length > 0) {
+                steps[0].classList.add('active');
+            }
         }
 
         // ===== SCROLL TO TOP ON SECTION TOGGLE =====
@@ -361,6 +411,12 @@
                     window.scrollTo({ top: scrollTop + rect.top - 20, behavior: 'smooth' });
                 }
             });
+        });
+
+        // ===== CALL UPDATE PROGRESS ON INPUT CHANGE =====
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('change', updateProgress);
+            el.addEventListener('keyup', updateProgress);
         });
     </script>
 </body>
