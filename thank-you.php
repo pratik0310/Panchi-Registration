@@ -15,7 +15,7 @@ $name = isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Volunteer';
         <div class="thankyou-card">
             <!-- Logo - Fixed Path -->
             <div class="logo-container">
-                <img src="logo.png" alt="Panchi" class="thankyou-logo" onerror="this.style.display='none'">
+                <img src="logo2.png" alt="Panchi" class="thankyou-logo" onerror="this.style.display='none'">
                 <div class="logo-fallback">🕊️</div>
             </div>
 

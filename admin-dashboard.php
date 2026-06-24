@@ -14,39 +14,59 @@ $offset = ($page - 1) * $limit;
 // Search functionality
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-$search_condition = '';
+// Filter functionality
+$status_filter = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : '';
+
+// Build WHERE conditions
+$conditions = array();
+
 if (!empty($search)) {
-    $search_condition = "WHERE 
-        full_name LIKE '%$search%' OR 
-        mobile_number LIKE '%$search%' OR 
-        email LIKE '%$search%' OR 
-        city LIKE '%$search%'";
+    $conditions[] = "(full_name LIKE '%$search%' OR mobile_number LIKE '%$search%' OR email LIKE '%$search%' OR city LIKE '%$search%')";
 }
 
-$count_sql = "SELECT COUNT(*) as total FROM registrations $search_condition";
+if (!empty($status_filter)) {
+    $conditions[] = "status = '$status_filter'";
+}
+
+$where_clause = '';
+if (!empty($conditions)) {
+    $where_clause = "WHERE " . implode(' AND ', $conditions);
+}
+
+// Count total records for pagination
+$count_sql = "SELECT COUNT(*) as total FROM registrations $where_clause";
 $count_result = mysqli_query($conn, $count_sql);
 $total_records = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_records / $limit);
 
-$sql = "SELECT * FROM registrations $search_condition ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+// Fetch records with pagination
+$sql = "SELECT * FROM registrations $where_clause ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $sql);
 
-if (empty($search)) {
-    $total_result = mysqli_query($conn, "SELECT COUNT(*) as total FROM registrations");
-    $total = mysqli_fetch_assoc($total_result)['total'];
+// ===== STATISTICS =====
+$total_result = mysqli_query($conn, "SELECT COUNT(*) as total FROM registrations");
+$total = mysqli_fetch_assoc($total_result)['total'];
 
-    $pending_result = mysqli_query($conn, "SELECT COUNT(*) as pending FROM registrations WHERE status = 'pending'");
-    $pending = mysqli_fetch_assoc($pending_result)['pending'];
+$pending_result = mysqli_query($conn, "SELECT COUNT(*) as pending FROM registrations WHERE status = 'pending'");
+$pending = mysqli_fetch_assoc($pending_result)['pending'];
 
-    $approved_result = mysqli_query($conn, "SELECT COUNT(*) as approved FROM registrations WHERE status = 'approved'");
-    $approved = mysqli_fetch_assoc($approved_result)['approved'];
-} else {
+$approved_result = mysqli_query($conn, "SELECT COUNT(*) as approved FROM registrations WHERE status = 'approved'");
+$approved = mysqli_fetch_assoc($approved_result)['approved'];
+
+$rejected_result = mysqli_query($conn, "SELECT COUNT(*) as rejected FROM registrations WHERE status = 'rejected'");
+$rejected = mysqli_fetch_assoc($rejected_result)['rejected'];
+
+// If search is active, show filtered counts
+if (!empty($search)) {
     $total = $total_records;
-    $pending_result = mysqli_query($conn, "SELECT COUNT(*) as pending FROM registrations $search_condition AND status = 'pending'");
+    $pending_result = mysqli_query($conn, "SELECT COUNT(*) as pending FROM registrations $where_clause AND status = 'pending'");
     $pending = mysqli_fetch_assoc($pending_result)['pending'];
     
-    $approved_result = mysqli_query($conn, "SELECT COUNT(*) as approved FROM registrations $search_condition AND status = 'approved'");
+    $approved_result = mysqli_query($conn, "SELECT COUNT(*) as approved FROM registrations $where_clause AND status = 'approved'");
     $approved = mysqli_fetch_assoc($approved_result)['approved'];
+
+    $rejected_result = mysqli_query($conn, "SELECT COUNT(*) as rejected FROM registrations $where_clause AND status = 'rejected'");
+    $rejected = mysqli_fetch_assoc($rejected_result)['rejected'];
 }
 ?>
 <!DOCTYPE html>
@@ -57,6 +77,248 @@ if (empty($search)) {
     <title>Panchi - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ===== STATS IN ONE LINE ===== */
+        .admin-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 120px;
+            background: #fff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            color: #b8860b;
+            flex-shrink: 0;
+        }
+
+        .stat-card.pending .stat-icon {
+            color: #ffc107;
+        }
+
+        .stat-card.approved .stat-icon {
+            color: #28a745;
+        }
+
+        .stat-card.rejected .stat-icon {
+            color: #dc3545;
+        }
+
+        .stat-info h3 {
+            font-size: 20px;
+            color: #2c1810;
+            line-height: 1.2;
+        }
+
+        .stat-info p {
+            color: #888;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .stat-card {
+                min-width: 100px;
+                padding: 12px 14px;
+            }
+            .stat-icon {
+                font-size: 20px;
+            }
+            .stat-info h3 {
+                font-size: 18px;
+            }
+            .stat-info p {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-stats {
+                gap: 8px;
+            }
+            .stat-card {
+                min-width: 80px;
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .stat-icon {
+                font-size: 16px;
+            }
+            .stat-info h3 {
+                font-size: 15px;
+            }
+            .stat-info p {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-stats {
+                gap: 6px;
+            }
+            .stat-card {
+                min-width: 60px;
+                padding: 8px 10px;
+                gap: 6px;
+                flex: 1 1 45%;
+            }
+            .stat-icon {
+                font-size: 14px;
+            }
+            .stat-info h3 {
+                font-size: 13px;
+            }
+            .stat-info p {
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .stat-card {
+                min-width: 50px;
+                padding: 6px 8px;
+                flex: 1 1 48%;
+            }
+            .stat-icon {
+                font-size: 12px;
+            }
+            .stat-info h3 {
+                font-size: 11px;
+            }
+            .stat-info p {
+                font-size: 8px;
+            }
+        }
+
+        /* ===== STATUS IN ONE LINE ===== */
+        .status-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .status-dot.pending {
+            background: #ffc107;
+        }
+
+        .status-dot.approved {
+            background: #28a745;
+        }
+
+        .status-dot.rejected {
+            background: #dc3545;
+        }
+
+        /* ===== DELETE BUTTON ===== */
+        .btn-delete {
+            padding: 3px 8px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* ===== FILTER BADGE ===== */
+        .filter-badge {
+            background: #fdf6ee;
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            border: 1px solid #d4b88c;
+        }
+
+        .filter-badge .badge-label {
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+        }
+
+        .filter-badge .badge-label.status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .filter-badge .badge-label.status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .filter-badge .badge-label.status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .remove-filter {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .remove-filter:hover {
+            color: #c82333;
+        }
+
+        /* ===== RESPONSIVE STATUS ===== */
+        @media (max-width: 600px) {
+            .status-inline {
+                gap: 4px;
+            }
+            
+            .status-inline .status-dot {
+                width: 8px;
+                height: 8px;
+            }
+            
+            .action-buttons {
+                gap: 3px;
+            }
+            
+            .btn-delete {
+                padding: 2px 6px;
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-container">
@@ -93,20 +355,23 @@ if (empty($search)) {
                         <span>Registrations</span>
                         <span class="badge"><?php echo $total; ?></span>
                     </a>
-                    <a href="#" class="sidebar-link" onclick="toggleFilter()">
+                    <a href="#" class="sidebar-link" onclick="toggleFilter(event)">
                         <i class="fas fa-filter"></i>
                         <span>Filter</span>
                         <i class="fas fa-chevron-down filter-arrow"></i>
                     </a>
                     <div class="sub-menu" id="filterMenu">
-                        <a href="admin-dashboard.php?status=pending" class="sub-link">
+                        <a href="admin-dashboard.php?status=pending" class="sub-link <?php echo ($status_filter == 'pending') ? 'active' : ''; ?>">
                             <span class="dot pending-dot"></span> Pending
+                            <span class="filter-count"><?php echo $pending; ?></span>
                         </a>
-                        <a href="admin-dashboard.php?status=approved" class="sub-link">
+                        <a href="admin-dashboard.php?status=approved" class="sub-link <?php echo ($status_filter == 'approved') ? 'active' : ''; ?>">
                             <span class="dot approved-dot"></span> Approved
+                            <span class="filter-count"><?php echo $approved; ?></span>
                         </a>
-                        <a href="admin-dashboard.php?status=rejected" class="sub-link">
+                        <a href="admin-dashboard.php?status=rejected" class="sub-link <?php echo ($status_filter == 'rejected') ? 'active' : ''; ?>">
                             <span class="dot rejected-dot"></span> Rejected
+                            <span class="filter-count"><?php echo $rejected; ?></span>
                         </a>
                         <a href="admin-dashboard.php" class="sub-link">
                             <i class="fas fa-undo"></i> Reset
@@ -128,13 +393,13 @@ if (empty($search)) {
 
             <!-- Main Content -->
             <main class="admin-main">
-                <!-- Stats Cards -->
+                <!-- Stats Cards - In One Line -->
                 <div class="admin-stats">
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-info">
                             <h3><?php echo $total; ?></h3>
-                            <p>Total Registrations</p>
+                            <p>Total</p>
                         </div>
                     </div>
                     <div class="stat-card pending">
@@ -151,6 +416,13 @@ if (empty($search)) {
                             <p>Approved</p>
                         </div>
                     </div>
+                    <div class="stat-card rejected">
+                        <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                        <div class="stat-info">
+                            <h3><?php echo $rejected; ?></h3>
+                            <p>Rejected</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Table Section -->
@@ -164,24 +436,40 @@ if (empty($search)) {
                             <div class="search-wrapper">
                                 <i class="fas fa-search search-icon"></i>
                                 <input type="text" name="search" placeholder="Search by name, email, mobile..." value="<?php echo htmlspecialchars($search); ?>">
+                                <?php if (!empty($status_filter)): ?>
+                                    <input type="hidden" name="status" value="<?php echo $status_filter; ?>">
+                                <?php endif; ?>
                                 <button type="submit" class="btn-search">
                                     <i class="fas fa-search"></i> Search
                                 </button>
-                                <?php if (!empty($search)): ?>
+                                <?php if (!empty($search) || !empty($status_filter)): ?>
                                     <a href="admin-dashboard.php" class="btn-clear">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-times"></i> Clear
                                     </a>
                                 <?php endif; ?>
                             </div>
                         </form>
                     </div>
 
+                    <!-- Filter Badge -->
+                    <?php if (!empty($status_filter)): ?>
+                        <div class="filter-badge">
+                            <i class="fas fa-filter"></i> Filter: 
+                            <span class="badge-label status-<?php echo $status_filter; ?>">
+                                <?php echo ucfirst($status_filter); ?>
+                            </span>
+                            <a href="admin-dashboard.php" class="remove-filter">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Responsive Table -->
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>sr.no</th>
                                     <th>Name</th>
                                     <th>Mobile</th>
                                     <th>Email</th>
@@ -206,9 +494,10 @@ if (empty($search)) {
                                         <td data-label="City"><?php echo htmlspecialchars($row['city']); ?></td>
                                         <td data-label="Participants"><?php echo $row['participants']; ?></td>
                                         <td data-label="Status">
-                                            <span class="status-badge status-<?php echo $row['status']; ?>">
-                                                <?php echo ucfirst($row['status']); ?>
-                                            </span>
+                                            <div class="status-inline">
+                                                <span class="status-dot <?php echo $row['status']; ?>"></span>
+                                                <span class="status-text"><?php echo ucfirst($row['status']); ?></span>
+                                            </div>
                                         </td>
                                         <td data-label="Screenshot">
                                             <a href="<?php echo $row['payment_screenshot']; ?>" target="_blank" class="btn-view">
@@ -217,14 +506,17 @@ if (empty($search)) {
                                         </td>
                                         <td data-label="Actions">
                                             <div class="action-buttons">
-                                                <a href="update-status.php?id=<?php echo $row['id']; ?>&status=approved" class="btn-approve" onclick="return confirm('Approve this registration?')">
+                                                <a href="update-status.php?id=<?php echo $row['id']; ?>&status=approved" class="btn-approve" onclick="return confirm('Approve this registration?')" title="Approve">
                                                     <i class="fas fa-check"></i>
                                                 </a>
-                                                <a href="update-status.php?id=<?php echo $row['id']; ?>&status=rejected" class="btn-reject" onclick="return confirm('Reject this registration?')">
+                                                <a href="update-status.php?id=<?php echo $row['id']; ?>&status=rejected" class="btn-reject" onclick="return confirm('Reject this registration?')" title="Reject">
                                                     <i class="fas fa-times"></i>
                                                 </a>
-                                                <a href="view-details.php?id=<?php echo $row['id']; ?>" class="btn-details">
+                                                <a href="view-details.php?id=<?php echo $row['id']; ?>" class="btn-details" title="View Details">
                                                     <i class="fas fa-info-circle"></i>
+                                                </a>
+                                                <a href="delete-record.php?id=<?php echo $row['id']; ?>" class="btn-delete" onclick="return confirm('Are you sure you want to permanently delete this registration? This action cannot be undone!')" title="Delete Record">
+                                                    <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
                                         </td>
@@ -236,6 +528,8 @@ if (empty($search)) {
                                             <i class="fas fa-inbox" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
                                             <?php if (!empty($search)): ?>
                                                 No results found for "<?php echo htmlspecialchars($search); ?>"
+                                            <?php elseif (!empty($status_filter)): ?>
+                                                No <?php echo $status_filter; ?> registrations found
                                             <?php else: ?>
                                                 No registrations yet
                                             <?php endif; ?>
@@ -254,7 +548,7 @@ if (empty($search)) {
                         </div>
                         <div class="pagination-links">
                             <?php if ($page > 1): ?>
-                                <a href="?page=<?php echo $page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="page-link">
+                                <a href="?page=<?php echo $page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status=' . urlencode($status_filter) : ''; ?>" class="page-link">
                                     <i class="fas fa-chevron-left"></i> Prev
                                 </a>
                             <?php else: ?>
@@ -268,7 +562,8 @@ if (empty($search)) {
                             $end_page = min($total_pages, $page + 2);
                             
                             if ($start_page > 1) {
-                                echo '<a href="?page=1' . (!empty($search) ? '&search=' . urlencode($search) : '') . '" class="page-link">1</a>';
+                                $params = http_build_query(array_filter(['search' => $search, 'status' => $status_filter]));
+                                echo '<a href="?page=1' . ($params ? '&' . $params : '') . '" class="page-link">1</a>';
                                 if ($start_page > 2) {
                                     echo '<span class="page-link dots">...</span>';
                                 }
@@ -276,19 +571,21 @@ if (empty($search)) {
                             
                             for ($i = $start_page; $i <= $end_page; $i++) {
                                 $active = $i == $page ? 'active' : '';
-                                echo '<a href="?page=' . $i . (!empty($search) ? '&search=' . urlencode($search) : '') . '" class="page-link ' . $active . '">' . $i . '</a>';
+                                $params = http_build_query(array_filter(['search' => $search, 'status' => $status_filter]));
+                                echo '<a href="?page=' . $i . ($params ? '&' . $params : '') . '" class="page-link ' . $active . '">' . $i . '</a>';
                             }
                             
                             if ($end_page < $total_pages) {
                                 if ($end_page < $total_pages - 1) {
                                     echo '<span class="page-link dots">...</span>';
                                 }
-                                echo '<a href="?page=' . $total_pages . (!empty($search) ? '&search=' . urlencode($search) : '') . '" class="page-link">' . $total_pages . '</a>';
+                                $params = http_build_query(array_filter(['search' => $search, 'status' => $status_filter]));
+                                echo '<a href="?page=' . $total_pages . ($params ? '&' . $params : '') . '" class="page-link">' . $total_pages . '</a>';
                             }
                             ?>
 
                             <?php if ($page < $total_pages): ?>
-                                <a href="?page=<?php echo $page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" class="page-link">
+                                <a href="?page=<?php echo $page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status=' . urlencode($status_filter) : ''; ?>" class="page-link">
                                     Next <i class="fas fa-chevron-right"></i>
                                 </a>
                             <?php else: ?>
@@ -322,7 +619,8 @@ if (empty($search)) {
         }
 
         // ===== TOGGLE FILTER SUB-MENU =====
-        function toggleFilter() {
+        function toggleFilter(event) {
+            event.preventDefault();
             const menu = document.getElementById('filterMenu');
             const arrow = document.querySelector('.filter-arrow');
             menu.classList.toggle('open');
@@ -339,7 +637,7 @@ if (empty($search)) {
             }
         });
 
-        // ===== CLOSE SIDEBAR ON RESIZE (Desktop) =====
+        // ===== CLOSE SIDEBAR ON RESIZE =====
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 const sidebar = document.getElementById('adminSidebar');
@@ -353,7 +651,6 @@ if (empty($search)) {
         // ===== COLLAPSIBLE TABLE ROWS ON MOBILE =====
         document.querySelectorAll('.table-responsive tbody tr').forEach(row => {
             row.addEventListener('click', function(e) {
-                // Don't trigger if clicking on action buttons or links
                 if (e.target.closest('.action-buttons') || e.target.closest('a') || e.target.closest('.btn-view')) {
                     return;
                 }
